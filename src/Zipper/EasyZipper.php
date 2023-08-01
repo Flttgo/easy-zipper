@@ -92,10 +92,10 @@ class EasyZipper
 
         $objectOrName = $type;
         if (is_string($type)) {
-            $objectOrName = 'Madnest\Madzipper\Repositories\\'.ucwords($type).'Repository';
+            $objectOrName = 'Zipper\\Repositories\\'.ucwords($type).'Repository';
         }
 
-        if (! is_subclass_of($objectOrName, 'Madnest\Madzipper\Repositories\RepositoryInterface')) {
+        if (! is_subclass_of($objectOrName, 'Zipper\\Repositories\RepositoryInterface')) {
             throw new \InvalidArgumentException("Class for '{$objectOrName}' must implement RepositoryInterface interface");
         }
 
