@@ -1,8 +1,13 @@
-# easy-zipper
+# EasyZipper
 
 This is a simple Wrapper around the ZipArchive methods with some handy functions.
 
-[![Build Status](https://github.com/flttgo/easy-zipper/workflows/Tests/badge.svg)](https://github.com/flttgo/easy-zipper/actions)
+## requirements
+
+```shell
+PHP: 7.3+
+Laravel: 5+
+```
 
 ## Installation
 
@@ -14,16 +19,17 @@ composer require flttgo/easy-zipper
 
 2. Optionally when using with easy, go to `app/config/app.php`
 
--   add to providers `flttgo\easy-zipper\easy-zipperServiceProvider::class`
+-   add to providers `Zipper\EasyZipperServiceProvider::class`
 
-You can now access easy-zipper with the `easy-zipper` alias.
+You can now access EasyZipper with the `EasyZipper` alias.
 
 
-## Simple easy example by using easy-zipper facade
+## Simple easy example by using EasyZipper facade
 
 ```php
+use Zipper\EasyZipper;
 $files = glob('public/files/*');
-easy-zipper::make('public/test.zip')->add($files)->close();
+EasyZipper::make('public/test.zip')->add($files)->close();
 ```
 
 -   by default the package will create the `test.zip` in the project route folder but in the example above we changed it to `project_route/public/`.
@@ -31,7 +37,7 @@ easy-zipper::make('public/test.zip')->add($files)->close();
 ## Another example
 
 ```php
-$zipper = new \flttgo\Zipper\EasyZipper;
+$zipper = new Zipper\EasyZipper;
 
 $zipper->make('test.zip')->folder('test')->add('composer.json');
 $zipper->zip('test.zip')->folder('test')->add('composer.json','test');
@@ -47,7 +53,7 @@ $zipper->folder('mySuperPackage')->add(
 
 $zipper->getFileContent('mySuperPackage/composer.json');
 
-$zipper->make('test.zip')->extractTo('', ['mySuperPackage/composer.json'], easy-zipper::WHITELIST);
+$zipper->make('test.zip')->extractTo('', ['mySuperPackage/composer.json'], EasyZipper::WHITELIST);
 
 $zipper->close();
 ```
@@ -82,8 +88,8 @@ removes a single file or an array of files from the zip.
 Specify a folder to 'add files to' or 'remove files from' from the zip, example
 
 ```php
-easy-zipper::make('test.zip')->folder('test')->add('composer.json');
-easy-zipper::make('test.zip')->folder('test')->remove('composer.json');
+EasyZipper::make('test.zip')->folder('test')->add('composer.json');
+EasyZipper::make('test.zip')->folder('test')->remove('composer.json');
 ```
 
 ## listFiles($regexFilter = null)
@@ -95,8 +101,8 @@ Lists all files within archive (if no filter pattern is provided). Use `$regexFi
 Example: Return all files/folders ending/not ending with '.log' pattern (case insensitive). This will return matches in sub folders and their sub folders also
 
 ```php
-$logFiles = easy-zipper::make('test.zip')->listFiles('/\.log$/i');
-$notLogFiles = easy-zipper::make('test.zip')->listFiles('/^(?!.*\.log).*$/i');
+$logFiles = EasyZipper::make('test.zip')->listFiles('/\.log$/i');
+$notLogFiles = EasyZipper::make('test.zip')->listFiles('/^(?!.*\.log).*$/i');
 ```
 
 ## home()
@@ -124,10 +130,11 @@ closes the zip and writes all changes.
 Extracts the content of the zip archive to the specified location, for example
 
 ```php
-easy-zipper::make('test.zip')->folder('test')->extractTo('foo');
+use Zipper\EasyZipper;
+EasyZipper::make('test.zip')->folder('test')->extractTo('foo');
 ```
 
-This will go into the folder `test` in the zip file and extract the content of that folder only to the folder `foo`, this is equal to using the `easy-zipper::WHITELIST`.
+This will go into the folder `test` in the zip file and extract the content of that folder only to the folder `foo`, this is equal to using the `EasyZipper::WHITELIST`.
 
 This command is really nice to get just a part of the zip file, you can also pass a 2nd & 3rd param to specify a single or an array of files that will be
 
@@ -136,27 +143,27 @@ This command is really nice to get just a part of the zip file, you can also pas
 
 white listed
 
-> **easy-zipper::WHITELIST**
+> **EasyZipper::WHITELIST**
 
 ```php
-easy-zipper::make('test.zip')->extractTo('public', array('vendor'), easy-zipper::WHITELIST);
+EasyZipper::make('test.zip')->extractTo('public', array('vendor'), EasyZipper::WHITELIST);
 ```
 
 Which will extract the `test.zip` into the `public` folder but **only** files/folders starting with `vendor` prefix inside the zip will be extracted.
 
 or black listed
 
-> **easy-zipper::BLACKLIST**
+> **EasyZipper::BLACKLIST**
 > Which will extract the `test.zip` into the `public` folder except files/folders starting with `vendor` prefix inside the zip will not be extracted.
 
 ```php
-easy-zipper::make('test.zip')->extractTo('public', array('vendor'), easy-zipper::BLACKLIST);
+EasyZipper::make('test.zip')->extractTo('public', array('vendor'), EasyZipper::BLACKLIST);
 ```
 
-> **easy-zipper::EXACT_MATCH**
+> **EasyZipper::EXACT_MATCH**
 
 ```php
-easy-zipper::make('test.zip')
+EasyZipper::make('test.zip')
     ->folder('vendor')
     ->extractTo('public', array('composer', 'bin/phpunit'), EasyZipper::WHITELIST | EasyZipper::EXACT_MATCH);
 ```
@@ -166,7 +173,7 @@ Which will extract the `test.zip` into the `public` folder but **only** files/fo
 -   extract file or folder named `composer` in folder named `vendor` inside zip to `public` resulting `public/composer`
 -   extract file or folder named `bin/phpunit` in `vendor/bin/phpunit` folder inside zip to `public` resulting `public/bin/phpunit`
 
-> **NB:** extracting files/folder from zip without setting easy-zipper::EXACT_MATCH
+> **NB:** extracting files/folder from zip without setting EasyZipper::EXACT_MATCH
 > When zip has similar structure as below and only `test.bat` is given as whitelist/blacklist argument then `extractTo` would extract all those files and folders as they all start with given string
 
 ```
@@ -184,13 +191,13 @@ Extracts the content of the zip archive matching regular expression to the speci
 Example: extract all files ending with `.php` from `src` folder and its sub folders.
 
 ```php
-easy-zipper::make('test.zip')->folder('src')->extractMatchingRegex($path, '/\.php$/i');
+EasyZipper::make('test.zip')->folder('src')->extractMatchingRegex($path, '/\.php$/i');
 ```
 
 Example: extract all files **except** those ending with `test.php` from `src` folder and its sub folders.
 
 ```php
-easy-zipper::make('test.zip')->folder('src')->extractMatchingRegex($path, '/^(?!.*test\.php).*$/i');
+EasyZipper::make('test.zip')->folder('src')->extractMatchingRegex($path, '/^(?!.*test\.php).*$/i');
 ```
 
 ## Testing
